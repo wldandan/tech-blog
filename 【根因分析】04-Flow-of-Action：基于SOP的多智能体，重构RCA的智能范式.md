@@ -1,0 +1,110 @@
+# 【根因分析】04-Flow-of-Action：基于SOP的多智能体，重构RCA的智能范式
+
+原文链接：https://zhuanlan.zhihu.com/p/2022034432215847678
+
+---
+
+​
+
+目录
+
+## 一、研究背景与核心挑战
+
+[微服务架构](https://zhida.zhihu.com/search?content_id=272255790&content_type=Article&match_order=1&q=%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%9E%B6%E6%9E%84&zhida_source=entity)已成为大规模Web系统的主流架构，但系统复杂度提升导致故障频发，严重的线上事故往往需要多名领域专家耗时数小时完成根因定位。传统基于深度学习的[RCA](https://zhida.zhihu.com/search?content_id=272255790&content_type=Article&match_order=1&q=RCA&zhida_source=entity)方法泛化性差、可解释性弱；而以ReAct为代表的[LLM智能体框架](https://zhida.zhihu.com/search?content_id=272255790&content_type=Article&match_order=1&q=LLM%E6%99%BA%E8%83%BD%E4%BD%93%E6%A1%86%E6%9E%B6&zhida_source=entity)，虽能提供可解释的诊断流程，却在RCA场景中存在显著短板，无法满足工业级系统的准确率要求，存在以下核心挑战：
+
+  1. **LLM的随机性与幻觉问题** ：作为概率模型，LLM在RCA的多模态数据处理、多工具调用过程中，极易引发不合理的工具调用与动作选择，让诊断流程偏离正确轨迹，无法定位真实根因。
+  2. **复杂观测下的动作选择困境** ：RCA场景中存在上百个运维API工具，相同的观测结果往往对应多个合理的诊断动作，LLM难以即时选出最优动作，导致诊断效率低、试错成本高。
+
+
+
+图1 挑战2的示例
+
+## 二、核心方案：[Flow-of-Action](https://zhida.zhihu.com/search?content_id=272255790&content_type=Article&match_order=1&q=Flow-of-Action&zhida_source=entity)框架
+
+Flow-of-Action是基于ReAct范式重构的一套完整的多智能体协同系统，其核心创新围绕[SOP Flow](https://zhida.zhihu.com/search?content_id=272255790&content_type=Article&match_order=1&q=SOP+Flow&zhida_source=entity)流程引擎、动作集决策机制、多角色智能体协同架构三大模块展开，，创新提出“思考-动作集-动作-观测”的诊断范式，形成了从故障告警到根因定位的全流程自动化、标准化诊断能力。
+
+图2 ReAct和Flow of Action的对比
+
+### 2.1 基础体系：知识库与工具集
+
+**双维度知识库**
+
+整合**SOP知识** （专家编写/自动提取的标准化RCA步骤，作为LLM推理的核心约束）与**历史故障事件库** （记录故障表象与类型，用于相似事件匹配与故障类型预判），解决传统RAG在运维场景检索效果不佳的问题。
+
+如图2所示，每个SOP构成一个独立的单元，包含两个属性：名称和步骤。名称概括了SOP的关键信息，该信息被转换为向量用于后续检索。
+
+**三类核心工具集**
+
+  1. 多模态数据采集分析工具：完成指标、链路、日志数据的异常检测与文本化转换，适配LLM的文本处理能力；
+  2. [SOP流](https://zhida.zhihu.com/search?content_id=272255790&content_type=Article&match_order=1&q=SOP%E6%B5%81&zhida_source=entity)专属工具：包含SOP匹配、SOP自动生成、SOP转代码、SOP代码执行、历史观测匹配五大核心工具；
+  3. 运维专属工具：针对K8s环境的Pod、服务、节点状态分析等原子化运维操作工具。
+
+
+
+### 2.2 核心创新1：SOP流（SOP flow）
+
+SOP流是为LLM设计的、基于SOP的标准化RCA执行逻辑链，通过prompt软约束引导LLM的诊断路径，在关键节点限制LLM的幻觉，同时保留其处理突发场景的灵活性。
+
+  * 核心执行链路：故障告警信息 → 匹配/自动生成对应SOP → 将SOP转换为可执行代码 → 执行代码获取观测结果 → 匹配历史故障事件 → 提取新的故障信息，形成闭环诊断。
+  * 关键设计：将文本化SOP转为可执行代码，既提升了步骤执行的准确性，保证了SOP多步骤操作的原子性，也大幅降低了LLM的token与资源消耗。
+
+
+
+图3 Flow-of-Action示例
+
+### 2.3 核心创新2：动作集（Action Set）
+
+针对复杂观测信息下多合理动作的选择难题，Flow-of-Action创新性提出**思考 - 动作集 - 行动 - 观测** 的决策逻辑，先由框架先生成带合理性解释的候选动作集，再由主智能体完成最终动作决策，而非直接执行单一动作。
+
+  * 动作集由ActionAgent基于SOP流生成的合规动作，与JudgeAgent基于根因判断补充的动作共同组成；
+  * 该设计平衡了LLM的随机性与确定性，SOP Flow的规则约束保障了诊断流程不偏离核心方向，避免过度随机导致的诊断发散；而动作集的开放性设计，又保留了LLM应对未知故障的灵活性，避免过度固化的流程无法适配复杂多变的生产场景。
+
+
+
+### 2.4 核心创新3：[多智能体协同架构](https://zhida.zhihu.com/search?content_id=272255790&content_type=Article&match_order=1&q=%E5%A4%9A%E6%99%BA%E8%83%BD%E4%BD%93%E5%8D%8F%E5%90%8C%E6%9E%B6%E6%9E%84&zhida_source=entity)
+
+框架设计了“1主多辅”的多智能体体系，通过职责拆分降低主智能体的认知负载，减少单智能体的幻觉与信息遗漏问题：
+
+  * **MainAgent** ：核心决策主体，统筹整个RCA流程，基于其他智能体的输出完成最终动作与根因判断；
+  * **ActionAgent** ：生成符合SOP流的候选动作集，为决策提供支撑；
+  * **ObAgent** ：从海量多模态观测数据中提取故障类型与关键信息，过滤无效噪声，缩小诊断范围；
+  * **JudgeAgent** ：评估当前迭代是否已定位根因，决定是否终止诊断流程；
+  * **CodeAgent** ：掌握全量工具信息，负责将SOP转换为可执行代码，保障SOP流的落地执行。
+
+
+
+## 三、实验验证与核心结果
+
+### 3.1 实验设置
+
+  * **数据集** ：基于Google Online Boutique开源电商微服务系统，通过[ChaosMesh](https://zhida.zhihu.com/search?content_id=272255790&content_type=Article&match_order=1&q=ChaosMesh&zhida_source=entity)注入9类典型故障（CPU压力、内存压力、Pod故障、6类网络异常），构建了包含90个故障事件的评测数据集。
+  * **评估指标** ：根因定位准确率（LA）、根因类型准确率（TA）、平均诊断路径长度（APL，评估诊断效率）。
+  * **基线方法** ：K8SGPT、HolmesGPT、CoT、ReAct、Reflexion，分别基于GPT-3.5-Turbo与[GPT-4-Turbo](https://zhida.zhihu.com/search?content_id=272255790&content_type=Article&match_order=1&q=GPT-4-Turbo&zhida_source=entity)进行对比。
+
+
+
+### 3.2 核心实验结果
+
+  1. **整体性能远超SOTA** ：基于GPT-4-Turbo的Flow-of-Action，综合准确率达64.01%，而业界主流的ReAct方法仅为35.50%，相对提升超80%；其根因定位准确率LA达70.89%，根因类型准确率TA达57.12%，均大幅领先所有基线方法。
+  2. **轻量化模型也有优异表现** ：基于GPT-3.5-Turbo的Flow-of-Action综合准确率仍可达54.06%，远超同基座的ReAct（29.22%）与Reflexion（21.89%）。
+  3. **消融实验验证模块有效性** ：移除SOP知识、SOP流、动作集或任一辅助智能体，均会导致模型准确率显著下降，其中移除SOP知识后综合准确率骤降至15.39%，证明SOP体系是框架的核心竞争力。
+  4. **效率表现均衡** ：Flow-of-Action的平均诊断路径长度APL处于合理区间，既避免了ReAct的过早误判，也解决了Reflexion迭代过多、效率低下的问题。
+
+
+
+## 四、结论
+
+Flow-of-Action的提出，为LLM在AIOps领域的工业化落地打开了全新的思路。作为首个以SOP为核心的智能体根因定位方案，它不仅实现了技术上的创新突破，更具备极高的产业落地价值：
+
+  1. 其将SRE团队沉淀的专家经验与LLM的强大推理能力深度融合，解决了长期以来LLM在运维场景中幻觉严重、决策不可控的核心痛点，让自动化RCA的准确率首次达到了生产环境的可用标准，能够大幅降低故障定位的时间成本，减少系统故障带来的业务损失，缓解运维团队的人力压力。
+  2. 该方案具备极强的通用性与可扩展性。其SOP自动生成能力，能够快速适配新的故障场景与业务系统，无需针对特定场景进行大量的模型微调；分层递进的诊断逻辑、多智能体的协同架构，也能够无缝适配不同规模、不同架构的微服务系统，具备广泛的行业适用性。
+
+
+
+未来，随着大语言模型技术的持续迭代，Flow-of-Action的架构还可进一步优化升级，比如通过更精细的SOP分层体系提升复杂故障的诊断能力，通过多智能体的博弈优化进一步提升决策精度，通过与更多运维工具的深度融合实现故障定位 - 分析 - 修复的全流程自动化。
+
+## 相关链接
+
+  1. [https://arxiv.org/pdf/2502.08224](https://link.zhihu.com/?target=https%3A//arxiv.org/pdf/2502.08224)
+
+
