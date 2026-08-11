@@ -10,13 +10,15 @@
 > 平台：知乎回答 | 状态：**草稿（待 humanizer + 网页发布）**
 > qid：2020813873368884488
 > 题目：从长上下文工程到 Harness 工程,你认为 Agent 工程下个发力点可能是哪里？
-> 差异化角度：正面回应翁荔《Harness Engineering for Self-Improvement》的自我改进链条（prompt→context→harness→optimizer），指出这条链条能走多深，取决于"骨架感知评测"跟不跟得上——评测是 Meta-Harness 敢用于生产的前提，不是可有可无的收尾工作。
+> 差异化角度：开篇直接回答"发力点在哪"——评测（骨架感知评测），再用翁荔《Harness Engineering for Self-Improvement》的自我改进链条（prompt→context→harness→optimizer）作证据：链条走多深，取决于评测跟不跟得上，它是 Meta-Harness 敢用于生产的前提，不是可有可无的收尾工作。
 
 ---
 
-先说背景。
+先说结论：我认为下一个发力点是评测——把评测能力从"任务跑没跑通"的单点打分，挪到骨架感知（scaffold-aware evaluation）和轨迹级归因。
 
-我这两年基本就在干一件事——把 AI Agent 往生产环境里推：openEuler 上的故障诊断（witty-diagnosis-agent，社区官方项目）、给 Agent 能力做全生命周期管理的平台（agent-insight）、一支 Agent 团队跑全流程研发（AET）。这三个场景的共同点是：错误代价是真实的，回路里没有人类随时纠偏。
+不管走的是上下文工程这条路，还是 Harness 工程这条路，甚至再往前一步搞 Harness 自我改进，卡住继续往前走的都是同一件事：你怎么知道新版本真的比旧版本好。
+
+这个判断是踩坑换来的。我这两年基本就在干一件事——把 AI Agent 往生产环境里推：openEuler 上的故障诊断（witty-diagnosis-agent，社区官方项目）、给 Agent 能力做全生命周期管理的平台（agent-insight）、一支 Agent 团队跑全流程研发（AET）。这三个场景的共同点是：错误代价是真实的，回路里没有人类随时纠偏。
 
 这道题这几天格外热闹，因为翁荔（前 OpenAI 安全副总裁、现 Thinking Machines Lab 联创）刚发了篇新博客《[Harness Engineering for Self-Improvement](https://lilianweng.github.io/posts/2026-07-04-harness/)》，DeepSeek 研究员崔添翼也转发附议。
 
@@ -24,7 +26,7 @@
 
 最前沿的 [Meta-Harness](https://arxiv.org/abs/2603.28052)（Lee et al. 2026），让一个 coding agent（论文里用的是 Claude Code + Opus 4.6，中位数每轮读 82 个文件）去读之前所有候选 harness 的源码、分数和执行轨迹，自己提案、自己改写下一版 harness，在 Pareto 前沿上留最好的几个——跑出来的效果比 ACE、MCE 这些手工设计的基线高 7.7–8.6 分，还能省 4 倍 context。
 
-这条链条我认同方向。但我想接着翁荔的框架讲一件她没重点展开的事：这条链条每往下沉一层，"变得更好"这件事就更难判断一次，而现在没人在管这个判断问题。
+这条链条我认同方向，而且它恰好印证了开头那句判断：链条每往下沉一层，"变得更好"这件事就更难判断一次——这正是评测要补上的缺口。
 
 下面拆开讲。
 
