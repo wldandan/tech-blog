@@ -22,7 +22,7 @@
 - Harness Engineering：在模型外面套工程层（脚手架/编排/状态机/容错），让 Agent 能跑长任务。
 - Multi-Agent 协作：多 Agent 分工、并行、消息通信、冲突解决。
 
-这三件事每个都有大量文章、视频、教材。但有个尴尬的事实是：Agent 在生产里依然普遍拉胯。Gartner 预测到 2027 年底超过 40% 的 Agentic AI 项目会被取消；CMU 的 TheAgentCompany 基准里，最强模型也只能自主完成 30.3% 的真实任务；MIT 调研显示约 95% 的生成式 AI 试点没有可衡量回报。
+这三件事每个都有大量文章、视频、教材。但有个尴尬的事实是：Agent 在生产里依然普遍拉胯。[Gartner 预测到 2027 年底超过 40% 的 Agentic AI 项目会被取消](https://www.gartner.com/en/newsroom/press-releases/2025-06-25-gartner-predicts-over-40-percent-of-agentic-ai-projects-will-be-canceled-by-end-of-2027)；CMU 的 [TheAgentCompany](https://arxiv.org/abs/2412.14161) 基准里，最强模型（Gemini 2.5 Pro）也只能自主完成 30.3% 的真实任务；[MIT NANDA 的调研](https://mlq.ai/media/quarterly_decks/v0.1_State_of_AI_in_Business_2025_Report.pdf)显示约 95% 的生成式 AI 试点没有可衡量回报。
 
 为什么不是这三件事做不到位，而是我们评价 Agent 的方式过时了——这才是问题。
 
@@ -32,11 +32,11 @@
 
 ## 二、发力点 1：骨架感知的评测（Scaffold-Aware Evaluation）
 
-先说一个概念：业界已经明确提出"骨架感知的评测"（scaffold-aware evaluation）——主张把围绕模型的整个控制栈纳入被评测的系统，而不是只测模型本身。
+先说一个概念：最近一批 agent 评测研究（比如 [OctoBench](https://arxiv.org/html/2601.10343)）已经明确提出"骨架感知的评测"（scaffold-aware evaluation）——主张把围绕模型的整个控制栈纳入被评测的系统，而不是只测模型本身。
 
 为什么这件事卡死了我们两年？因为 Agent 的失败，绝大多数不在模型上，而在骨架上。
 
-典型例子（NeurIPS 2025 的 MAST 多智能体失败分类法）：
+典型例子（[NeurIPS 2025 的 MAST 多智能体失败分类法](https://proceedings.neurips.cc/paper_files/paper/2025/hash/b1041e52d3be19f0a9bc491657488e4a-Abstract-Datasets_and_Benchmarks_Track.html)，分析了 1600+ 条真实执行轨迹）：
 
 - 系统设计失败：角色定义不清、任务边界重叠、上下文传递链路断。
 - 协作错位失败：Agent 之间协议不一致、消息丢失、循环死锁。
@@ -52,7 +52,7 @@
 - 是上下文不够、还是上下文传递丢了？
 - 是状态机卡死、还是终止条件没触发？
 
-我自己在 agent-insight 里做的也是这件事。每次 Agent 跑完一条任务，不只记录"成功/失败"，而是把完整的轨迹、上下文快照、决策链都存下来，跑 MAST 那一套归因，把失败归到"规格 / 协作 / 验证"三类里。
+我自己在 [agent-insight](https://atomgit.com/openeuler/agent-insight) 里做的也是这件事。每次 Agent 跑完一条任务，不只记录"成功/失败"，而是把完整的轨迹、上下文快照、决策链都存下来，跑 MAST 那一套归因，把失败归到"规格 / 协作 / 验证"三类里。
 
 这条路一开始很重，但只要落地，团队就能从"我们不知道 Agent 为什么挂着"变成"我能精准定位是哪一层在挂"。这一步，是大多数团队还没迈过去的那道坎。
 
@@ -102,7 +102,7 @@
 
 第二，优化不能改完就算数，得自带把关。优化 Agent 改完 Skill 后自动过三道门：结构门（引用的脚本都在、能编译）、脚本真值门（算出来的数拿标准答案核对）、行为门（拿几道题真跑一遍，和旧版本比分）。任何一道发现变差就打回让它自己修（repair），三道全过了才轮到我拍板确认成新版本。
 
-DSPy 生态的 GEPA 这类反思式优化已经能从执行轨迹中诊断"为什么失败"，再自动进化出更优 prompt，多个基准上以最多 35 倍更少的试验次数超越强化学习；研究也开始把 Harness 本身当作搜索空间，让智能体自动改写自己的骨架。
+DSPy 生态的 [GEPA](https://arxiv.org/abs/2507.19457) 这类反思式优化已经能从执行轨迹中诊断"为什么失败"，再自动进化出更优 prompt，多个基准上以最多 35 倍更少的 rollout 次数超越强化学习（GRPO）；研究也开始把 Harness 本身当作搜索空间，让智能体自动改写自己的骨架。
 
 ---
 
