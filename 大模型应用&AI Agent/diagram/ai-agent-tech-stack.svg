@@ -1,0 +1,313 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 700" width="1100" height="700">
+<defs>
+  <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+    <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#1e293b" stroke-width="0.5"/>
+  </pattern>
+  <marker id="arrow" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+    <polygon points="0 0, 10 3.5, 0 7" fill="#64748b"/>
+  </marker>
+  <marker id="arrow-cyan" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+    <polygon points="0 0, 10 3.5, 0 7" fill="#22d3ee"/>
+  </marker>
+  <marker id="arrow-emerald" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+    <polygon points="0 0, 10 3.5, 0 7" fill="#34d399"/>
+  </marker>
+  <marker id="arrow-violet" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+    <polygon points="0 0, 10 3.5, 0 7" fill="#a78bfa"/>
+  </marker>
+  <marker id="arrow-amber" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+    <polygon points="0 0, 10 3.5, 0 7" fill="#fbbf24"/>
+  </marker>
+</defs>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&amp;display=swap');
+  text { font-family: 'JetBrains Mono', 'SF Mono', 'Cascadia Code', monospace; }
+</style>
+
+<!-- Background -->
+<rect width="100%" height="100%" fill="#0f172a"/>
+<rect width="100%" height="100%" fill="url(#grid)"/>
+
+<!-- Title Block -->
+<text x="30" y="35" fill="#22d3ee" font-size="16" font-weight="700">AI Agent 应用开发技术栈全景图</text>
+<text x="30" y="52" fill="#64748b" font-size="9">AI Agent Application Development Tech Stack — Layered Architecture</text>
+
+<!-- Layer Labels (left side) -->
+<text x="30" y="110" fill="#94a3b8" font-size="9" font-weight="600">01</text>
+<text x="30" y="275" fill="#94a3b8" font-size="9" font-weight="600">02</text>
+<text x="30" y="445" fill="#94a3b8" font-size="9" font-weight="600">03</text>
+<text x="30" y="610" fill="#94a3b8" font-size="9" font-weight="600">04</text>
+
+<!-- ======================== -->
+<!-- LAYER 1: Applications (y=60-190) -->
+<!-- ======================== -->
+<rect x="90" y="60" width="980" height="130" rx="12" fill="none" stroke="#22d3ee" stroke-width="1" stroke-dasharray="4,4"/>
+<text x="100" y="78" fill="#22d3ee" font-size="9" font-weight="600">应用层 / APPLICATIONS</text>
+
+<!-- App Cards Row 1 -->
+<!-- AgentForce -->
+<rect x="100" y="90" width="160" height="45" rx="6" fill="#0f172a"/>
+<rect x="100" y="90" width="160" height="45" rx="6" fill="rgba(8,51,68,0.6)" stroke="#22d3ee" stroke-width="1.5"/>
+<text x="180" y="108" fill="white" font-size="10" font-weight="600" text-anchor="middle">AgentForce</text>
+<text x="180" y="122" fill="#94a3b8" font-size="8" text-anchor="middle">Salesforce 企业级</text>
+
+<!-- Deep Research -->
+<rect x="280" y="90" width="160" height="45" rx="6" fill="#0f172a"/>
+<rect x="280" y="90" width="160" height="45" rx="6" fill="rgba(8,51,68,0.6)" stroke="#22d3ee" stroke-width="1.5"/>
+<text x="360" y="108" fill="white" font-size="10" font-weight="600" text-anchor="middle">Deep Research</text>
+<text x="360" y="122" fill="#94a3b8" font-size="8" text-anchor="middle">OpenAI / Gemini</text>
+
+<!-- Cursor -->
+<rect x="460" y="90" width="160" height="45" rx="6" fill="#0f172a"/>
+<rect x="460" y="90" width="160" height="45" rx="6" fill="rgba(8,51,68,0.6)" stroke="#22d3ee" stroke-width="1.5"/>
+<text x="540" y="108" fill="white" font-size="10" font-weight="600" text-anchor="middle">Cursor / Copilot</text>
+<text x="540" y="122" fill="#94a3b8" font-size="8" text-anchor="middle">AI 编程助手</text>
+
+<!-- Jasper -->
+<rect x="640" y="90" width="160" height="45" rx="6" fill="#0f172a"/>
+<rect x="640" y="90" width="160" height="45" rx="6" fill="rgba(8,51,68,0.6)" stroke="#22d3ee" stroke-width="1.5"/>
+<text x="720" y="108" fill="white" font-size="10" font-weight="600" text-anchor="middle">Jasper</text>
+<text x="720" y="122" fill="#94a3b8" font-size="8" text-anchor="middle">内容创作</text>
+
+<!-- Cognigy -->
+<rect x="820" y="90" width="160" height="45" rx="6" fill="#0f172a"/>
+<rect x="820" y="90" width="160" height="45" rx="6" fill="rgba(8,51,68,0.6)" stroke="#22d3ee" stroke-width="1.5"/>
+<text x="900" y="108" fill="white" font-size="10" font-weight="600" text-anchor="middle">Cognigy / Ada</text>
+<text x="900" y="122" fill="#94a3b8" font-size="8" text-anchor="middle">智能客服</text>
+
+<!-- App Cards Row 2 -->
+<!-- Lindy -->
+<rect x="100" y="145" width="110" height="35" rx="6" fill="#0f172a"/>
+<rect x="100" y="145" width="110" height="35" rx="6" fill="rgba(8,51,68,0.4)" stroke="#22d3ee" stroke-width="1"/>
+<text x="155" y="163" fill="white" font-size="9" font-weight="600" text-anchor="middle">Lindy</text>
+<text x="155" y="175" fill="#64748b" font-size="7" text-anchor="middle">个人助手</text>
+
+<!-- Pi -->
+<rect x="220" y="145" width="110" height="35" rx="6" fill="#0f172a"/>
+<rect x="220" y="145" width="110" height="35" rx="6" fill="rgba(8,51,68,0.4)" stroke="#22d3ee" stroke-width="1"/>
+<text x="275" y="163" fill="white" font-size="9" font-weight="600" text-anchor="middle">Pi (Inflection)</text>
+<text x="275" y="175" fill="#64748b" font-size="7" text-anchor="middle">情感助手</text>
+
+<!-- Harvey -->
+<rect x="340" y="145" width="110" height="35" rx="6" fill="#0f172a"/>
+<rect x="340" y="145" width="110" height="35" rx="6" fill="rgba(8,51,68,0.4)" stroke="#22d3ee" stroke-width="1"/>
+<text x="395" y="163" fill="white" font-size="9" font-weight="600" text-anchor="middle">Harvey AI</text>
+<text x="395" y="175" fill="#64748b" font-size="7" text-anchor="middle">法律合同</text>
+
+<!-- DataRobot -->
+<rect x="460" y="145" width="110" height="35" rx="6" fill="#0f172a"/>
+<rect x="460" y="145" width="110" height="35" rx="6" fill="rgba(8,51,68,0.4)" stroke="#22d3ee" stroke-width="1"/>
+<text x="515" y="163" fill="white" font-size="9" font-weight="600" text-anchor="middle">DataRobot</text>
+<text x="515" y="175" fill="#64748b" font-size="7" text-anchor="middle">数据分析</text>
+
+<!-- 数势科技 -->
+<rect x="580" y="145" width="110" height="35" rx="6" fill="#0f172a"/>
+<rect x="580" y="145" width="110" height="35" rx="6" fill="rgba(8,51,68,0.4)" stroke="#22d3ee" stroke-width="1"/>
+<text x="635" y="163" fill="white" font-size="9" font-weight="600" text-anchor="middle">数势科技</text>
+<text x="635" y="175" fill="#64748b" font-size="7" text-anchor="middle">数据智能</text>
+
+<!-- Auquan -->
+<rect x="700" y="145" width="110" height="35" rx="6" fill="#0f172a"/>
+<rect x="700" y="145" width="110" height="35" rx="6" fill="rgba(8,51,68,0.4)" stroke="#22d3ee" stroke-width="1"/>
+<text x="755" y="163" fill="white" font-size="9" font-weight="600" text-anchor="middle">Auquan</text>
+<text x="755" y="175" fill="#64748b" font-size="7" text-anchor="middle">金融科技</text>
+
+<!-- 更多 -->
+<rect x="820" y="145" width="160" height="35" rx="6" fill="#0f172a"/>
+<rect x="820" y="145" width="160" height="35" rx="6" fill="rgba(8,51,68,0.3)" stroke="#334155" stroke-width="1" stroke-dasharray="3,3"/>
+<text x="900" y="163" fill="#64748b" font-size="9" font-weight="500" text-anchor="middle">+ 更多行业应用</text>
+
+<!-- Arrow down from Layer 1 to 2 -->
+<path d="M 550 190 L 550 225" fill="none" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+<text x="560" y="212" fill="#64748b" font-size="7">编排 / 调度</text>
+
+<!-- ======================== -->
+<!-- LAYER 2: Platform (y=225-400) -->
+<!-- ======================== -->
+<rect x="90" y="225" width="980" height="175" rx="12" fill="none" stroke="#34d399" stroke-width="1" stroke-dasharray="4,4"/>
+<text x="100" y="243" fill="#34d399" font-size="9" font-weight="600">平台层 / PLATFORM &amp; FRAMEWORKS</text>
+
+<!-- Sub-components within Platform -->
+<!-- 左侧：开发框架 -->
+<text x="110" y="262" fill="#64748b" font-size="8" font-weight="500">开发框架</text>
+<rect x="100" y="268" width="220" height="55" rx="6" fill="#0f172a"/>
+<rect x="100" y="268" width="220" height="55" rx="6" fill="rgba(6,78,59,0.4)" stroke="#34d399" stroke-width="1.5"/>
+<text x="210" y="285" fill="white" font-size="10" font-weight="600" text-anchor="middle">LangChain / LangGraph</text>
+<text x="210" y="300" fill="#94a3b8" font-size="8" text-anchor="middle">AutoGen · Dify · Coze · SGLang</text>
+
+<rect x="330" y="268" width="110" height="55" rx="6" fill="#0f172a"/>
+<rect x="330" y="268" width="110" height="55" rx="6" fill="rgba(6,78,59,0.4)" stroke="#34d399" stroke-width="1.5"/>
+<text x="385" y="290" fill="white" font-size="10" font-weight="600" text-anchor="middle">AutoGen</text>
+<text x="385" y="305" fill="#64748b" font-size="8" text-anchor="middle">微软多Agent</text>
+
+<rect x="450" y="268" width="110" height="55" rx="6" fill="#0f172a"/>
+<rect x="450" y="268" width="110" height="55" rx="6" fill="rgba(6,78,59,0.4)" stroke="#34d399" stroke-width="1.5"/>
+<text x="505" y="290" fill="white" font-size="10" font-weight="600" text-anchor="middle">Dify / Coze</text>
+<text x="505" y="305" fill="#64748b" font-size="8" text-anchor="middle">可视化编排</text>
+
+<!-- 右侧：基础设施组件 -->
+<text x="110" y="338" fill="#64748b" font-size="8" font-weight="500">Agent 核心组件</text>
+
+<!-- Memory -->
+<rect x="100" y="344" width="130" height="45" rx="6" fill="#0f172a"/>
+<rect x="100" y="344" width="130" height="45" rx="6" fill="rgba(6,78,59,0.3)" stroke="#34d399" stroke-width="1"/>
+<text x="165" y="362" fill="white" font-size="9" font-weight="600" text-anchor="middle">记忆系统</text>
+<text x="165" y="376" fill="#64748b" font-size="7" text-anchor="middle">Memory</text>
+
+<!-- Planning -->
+<rect x="240" y="344" width="130" height="45" rx="6" fill="#0f172a"/>
+<rect x="240" y="344" width="130" height="45" rx="6" fill="rgba(6,78,59,0.3)" stroke="#34d399" stroke-width="1"/>
+<text x="305" y="362" fill="white" font-size="9" font-weight="600" text-anchor="middle">规划与推理</text>
+<text x="305" y="376" fill="#64748b" font-size="7" text-anchor="middle">Planning</text>
+
+<!-- Tools -->
+<rect x="380" y="344" width="130" height="45" rx="6" fill="#0f172a"/>
+<rect x="380" y="344" width="130" height="45" rx="6" fill="rgba(6,78,59,0.3)" stroke="#34d399" stroke-width="1"/>
+<text x="445" y="362" fill="white" font-size="9" font-weight="600" text-anchor="middle">工具调用</text>
+<text x="445" y="376" fill="#64748b" font-size="7" text-anchor="middle">Tool Calling</text>
+
+<!-- RAG -->
+<rect x="100" y="395" width="130" height="45" rx="6" fill="#0f172a"/>
+<rect x="100" y="395" width="130" height="45" rx="6" fill="rgba(6,78,59,0.3)" stroke="#34d399" stroke-width="1"/>
+<text x="165" y="413" fill="white" font-size="9" font-weight="600" text-anchor="middle">RAG / GraphRAG</text>
+<text x="165" y="427" fill="#64748b" font-size="7" text-anchor="middle">检索增强生成</text>
+
+<!-- MCP -->
+<rect x="240" y="395" width="130" height="45" rx="6" fill="#0f172a"/>
+<rect x="240" y="395" width="130" height="45" rx="6" fill="rgba(6,78,59,0.3)" stroke="#34d399" stroke-width="1"/>
+<text x="305" y="413" fill="white" font-size="9" font-weight="600" text-anchor="middle">MCP / A2A</text>
+<text x="305" y="427" fill="#64748b" font-size="7" text-anchor="middle">协议</text>
+
+<!-- Observability -->
+<rect x="380" y="395" width="130" height="45" rx="6" fill="#0f172a"/>
+<rect x="380" y="395" width="130" height="45" rx="6" fill="rgba(6,78,59,0.3)" stroke="#34d399" stroke-width="1"/>
+<text x="445" y="413" fill="white" font-size="9" font-weight="600" text-anchor="middle">观测与调测</text>
+<text x="445" y="427" fill="#64748b" font-size="7" text-anchor="middle">Observability</text>
+
+<!-- 右侧大组件: 多Agent框架 -->
+<text x="570" y="262" fill="#64748b" font-size="8" font-weight="500">多Agent 系统</text>
+<rect x="570" y="268" width="490" height="130" rx="8" fill="#0f172a"/>
+<rect x="570" y="268" width="490" height="130" rx="8" fill="rgba(6,78,59,0.3)" stroke="#34d399" stroke-width="1.5"/>
+
+<!-- Multi-Agent boxes -->
+<rect x="585" y="280" width="130" height="40" rx="5" fill="rgba(6,78,59,0.5)" stroke="#34d399" stroke-width="1"/>
+<text x="650" y="296" fill="white" font-size="9" font-weight="600" text-anchor="middle">MetaGPT</text>
+<text x="650" y="310" fill="#64748b" font-size="7" text-anchor="middle">多Agent编程</text>
+
+<rect x="730" y="280" width="130" height="40" rx="5" fill="rgba(6,78,59,0.5)" stroke="#34d399" stroke-width="1"/>
+<text x="795" y="296" fill="white" font-size="9" font-weight="600" text-anchor="middle">CAMEL</text>
+<text x="795" y="310" fill="#64748b" font-size="7" text-anchor="middle">角色扮演通信</text>
+
+<rect x="875" y="280" width="130" height="40" rx="5" fill="rgba(6,78,59,0.5)" stroke="#34d399" stroke-width="1"/>
+<text x="940" y="296" fill="white" font-size="9" font-weight="600" text-anchor="middle">AgentScope</text>
+<text x="940" y="310" fill="#64748b" font-size="7" text-anchor="middle">华东师大多Agent</text>
+
+<rect x="585" y="330" width="130" height="40" rx="5" fill="rgba(6,78,59,0.5)" stroke="#34d399" stroke-width="1"/>
+<text x="650" y="346" fill="white" font-size="9" font-weight="600" text-anchor="middle">HuggingGPT</text>
+<text x="650" y="360" fill="#64748b" font-size="7" text-anchor="middle">多模态专家</text>
+
+<rect x="730" y="330" width="130" height="40" rx="5" fill="rgba(6,78,59,0.5)" stroke="#34d399" stroke-width="1"/>
+<text x="795" y="346" fill="white" font-size="9" font-weight="600" text-anchor="middle">XAgent</text>
+<text x="795" y="360" fill="#64748b" font-size="7" text-anchor="middle">双循环自主</text>
+
+<rect x="875" y="330" width="130" height="40" rx="5" fill="rgba(6,78,59,0.5)" stroke="#34d399" stroke-width="1"/>
+<text x="940" y="346" fill="white" font-size="9" font-weight="600" text-anchor="middle">BedRock Orch.</text>
+<text x="940" y="360" fill="#64748b" font-size="7" text-anchor="middle">AWS 多Agent</text>
+
+<!-- Arrow down from Layer 2 to 3 -->
+<path d="M 550 400 L 550 440" fill="none" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+<text x="560" y="424" fill="#64748b" font-size="7">LLM 调用</text>
+
+<!-- ======================== -->
+<!-- LAYER 3: Models (y=440-530) -->
+<!-- ======================== -->
+<rect x="90" y="440" width="980" height="90" rx="12" fill="none" stroke="#a78bfa" stroke-width="1" stroke-dasharray="4,4"/>
+<text x="100" y="458" fill="#a78bfa" font-size="9" font-weight="600">模型层 / LLM MODELS</text>
+
+<!-- Model cards -->
+<rect x="100" y="465" width="200" height="55" rx="6" fill="#0f172a"/>
+<rect x="100" y="465" width="200" height="55" rx="6" fill="rgba(76,29,149,0.4)" stroke="#a78bfa" stroke-width="1.5"/>
+<text x="200" y="485" fill="white" font-size="10" font-weight="600" text-anchor="middle">GPT-4o / o1 / o3</text>
+<text x="200" y="500" fill="#94a3b8" font-size="8" text-anchor="middle">OpenAI · ChatGPT</text>
+
+<rect x="315" y="465" width="200" height="55" rx="6" fill="#0f172a"/>
+<rect x="315" y="465" width="200" height="55" rx="6" fill="rgba(76,29,149,0.4)" stroke="#a78bfa" stroke-width="1.5"/>
+<text x="415" y="485" fill="white" font-size="10" font-weight="600" text-anchor="middle">Gemini 2.0 / DeepMind</text>
+<text x="415" y="500" fill="#94a3b8" font-size="8" text-anchor="middle">Google · Vertex AI</text>
+
+<rect x="530" y="465" width="200" height="55" rx="6" fill="#0f172a"/>
+<rect x="530" y="465" width="200" height="55" rx="6" fill="rgba(76,29,149,0.4)" stroke="#a78bfa" stroke-width="1.5"/>
+<text x="630" y="485" fill="white" font-size="10" font-weight="600" text-anchor="middle">Claude 3.5 / Anthropic</text>
+<text x="630" y="500" fill="#94a3b8" font-size="8" text-anchor="middle">企业级 LLM</text>
+
+<rect x="745" y="465" width="140" height="55" rx="6" fill="#0f172a"/>
+<rect x="745" y="465" width="140" height="55" rx="6" fill="rgba(76,29,149,0.4)" stroke="#a78bfa" stroke-width="1.5"/>
+<text x="815" y="485" fill="white" font-size="10" font-weight="600" text-anchor="middle">LLaMA 3.1</text>
+<text x="815" y="500" fill="#94a3b8" font-size="8" text-anchor="middle">Meta 开源</text>
+
+<rect x="900" y="465" width="140" height="55" rx="6" fill="#0f172a"/>
+<rect x="900" y="465" width="140" height="55" rx="6" fill="rgba(76,29,149,0.3)" stroke="#334155" stroke-width="1" stroke-dasharray="3,3"/>
+<text x="970" y="485" fill="#64748b" font-size="9" font-weight="500" text-anchor="middle">+ MiniMax / GLM</text>
+<text x="970" y="500" fill="#64748b" font-size="7" text-anchor="middle">国产模型</text>
+
+<!-- Arrow down from Layer 3 to 4 -->
+<path d="M 550 530 L 550 565" fill="none" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+<text x="560" y="550" fill="#64748b" font-size="7">推理 / 训练</text>
+
+<!-- ======================== -->
+<!-- LAYER 4: Infrastructure (y=565-670) -->
+<!-- ======================== -->
+<rect x="90" y="565" width="980" height="105" rx="12" fill="none" stroke="#fbbf24" stroke-width="1" stroke-dasharray="4,4"/>
+<text x="100" y="583" fill="#fbbf24" font-size="9" font-weight="600">基础设施层 / INFRASTRUCTURE</text>
+
+<!-- GPU -->
+<rect x="100" y="590" width="170" height="65" rx="6" fill="#0f172a"/>
+<rect x="100" y="590" width="170" height="65" rx="6" fill="rgba(120,53,15,0.4)" stroke="#fbbf24" stroke-width="1.5"/>
+<text x="185" y="610" fill="white" font-size="10" font-weight="600" text-anchor="middle">GPU 计算集群</text>
+<text x="185" y="625" fill="#94a3b8" font-size="8" text-anchor="middle">NVIDIA A100/H100</text>
+<text x="185" y="640" fill="#64748b" font-size="7" text-anchor="middle">vLLM · TensorRT</text>
+
+<!-- Cloud -->
+<rect x="285" y="590" width="170" height="65" rx="6" fill="#0f172a"/>
+<rect x="285" y="590" width="170" height="65" rx="6" fill="rgba(120,53,15,0.4)" stroke="#fbbf24" stroke-width="1.5"/>
+<text x="370" y="610" fill="white" font-size="10" font-weight="600" text-anchor="middle">云计算平台</text>
+<text x="370" y="625" fill="#94a3b8" font-size="8" text-anchor="middle">AWS · GCP · Azure</text>
+<text x="370" y="640" fill="#64748b" font-size="7" text-anchor="middle">Kubernetes</text>
+
+<!-- Vector DB -->
+<rect x="470" y="590" width="170" height="65" rx="6" fill="#0f172a"/>
+<rect x="470" y="590" width="170" height="65" rx="6" fill="rgba(120,53,15,0.4)" stroke="#fbbf24" stroke-width="1.5"/>
+<text x="555" y="610" fill="white" font-size="10" font-weight="600" text-anchor="middle">向量数据库</text>
+<text x="555" y="625" fill="#94a3b8" font-size="8" text-anchor="middle">Pinecone · Milvus</text>
+<text x="555" y="640" fill="#64748b" font-size="7" text-anchor="middle">Chroma · Weaviate</text>
+
+<!-- Cloudflare -->
+<rect x="655" y="590" width="170" height="65" rx="6" fill="#0f172a"/>
+<rect x="655" y="590" width="170" height="65" rx="6" fill="rgba(120,53,15,0.4)" stroke="#fbbf24" stroke-width="1.5"/>
+<text x="740" y="610" fill="white" font-size="10" font-weight="600" text-anchor="middle">Serverless / Edge</text>
+<text x="740" y="625" fill="#94a3b8" font-size="8" text-anchor="middle">Cloudflare Workers</text>
+<text x="740" y="640" fill="#64748b" font-size="7" text-anchor="middle">KV · R2 · AI Gateway</text>
+
+<!-- Data -->
+<rect x="840" y="590" width="200" height="65" rx="6" fill="#0f172a"/>
+<rect x="840" y="590" width="200" height="65" rx="6" fill="rgba(120,53,15,0.4)" stroke="#fbbf24" stroke-width="1.5"/>
+<text x="940" y="610" fill="white" font-size="10" font-weight="600" text-anchor="middle">数据与缓存</text>
+<text x="940" y="625" fill="#94a3b8" font-size="8" text-anchor="middle">PostgreSQL · Redis</text>
+<text x="940" y="640" fill="#64748b" font-size="7" text-anchor="middle">S3 · Kafka</text>
+
+<!-- ======================== -->
+<!-- LEGEND -->
+<!-- ======================== -->
+<rect x="90" y="645" width="980" height="1" fill="#1e293b"/>
+<text x="90" y="660" fill="#94a3b8" font-size="8">图例</text>
+<rect x="130" y="652" width="12" height="12" rx="2" fill="rgba(8,51,68,0.6)" stroke="#22d3ee" stroke-width="1"/>
+<text x="148" y="662" fill="#64748b" font-size="8">应用层</text>
+<rect x="195" y="652" width="12" height="12" rx="2" fill="rgba(6,78,59,0.4)" stroke="#34d399" stroke-width="1"/>
+<text x="213" y="662" fill="#64748b" font-size="8">平台层</text>
+<rect x="263" y="652" width="12" height="12" rx="2" fill="rgba(76,29,149,0.4)" stroke="#a78bfa" stroke-width="1"/>
+<text x="281" y="662" fill="#64748b" font-size="8">模型层</text>
+<rect x="331" y="652" width="12" height="12" rx="2" fill="rgba(120,53,15,0.4)" stroke="#fbbf24" stroke-width="1"/>
+<text x="349" y="662" fill="#64748b" font-size="8">基础设施</text>
+<text x="900" y="662" fill="#475569" font-size="7">© 2025 AI Agent Tech Stack · 共建 AGI 生态</text>
+
+</svg>

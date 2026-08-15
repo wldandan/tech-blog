@@ -1,0 +1,874 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>知乎运营闭环 v2 — 设计文档</title>
+<style>
+  :root {
+    --bg: #0f1117; --bg-elevated: #161922; --bg-card: #1c2030; --bg-card-hover: #232838;
+    --fg: #e7e9ee; --fg-muted: #9099ad; --fg-dim: #5d6478;
+    --line: #2a2f3e; --line-strong: #3a4055;
+    --accent: #7c9eff; --accent-strong: #a4baff; --accent-soft: rgba(124,158,255,.12);
+    --green: #34d399; --green-soft: rgba(52,211,153,.15);
+    --yellow: #fbbf24; --yellow-soft: rgba(251,191,36,.15);
+    --red: #f87171; --red-soft: rgba(248,113,113,.15);
+    --gray: #94a3b8; --gray-soft: rgba(148,163,184,.15);
+    --purple: #c084fc; --purple-soft: rgba(192,132,252,.15);
+    --shadow: 0 10px 30px rgba(0,0,0,.4);
+  }
+  @media (prefers-color-scheme:light) {
+    :root {
+      --bg:#fafbfc; --bg-elevated:#fff; --bg-card:#fff; --bg-card-hover:#f6f7fa;
+      --fg:#1a1d27; --fg-muted:#4d5566; --fg-dim:#8089a0;
+      --line:#e2e6ee; --line-strong:#d0d6e0;
+      --accent:#3b65e8; --accent-strong:#2547c4; --accent-soft:rgba(59,101,232,.1);
+      --shadow:0 8px 24px rgba(0,0,0,.08);
+    }
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--fg);font:15px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;-webkit-font-smoothing:antialiased}
+  code,pre,.mono{font-family:"JetBrains Mono","SF Mono",Menlo,Consolas,monospace}
+  a{color:var(--accent);text-decoration:none}
+  a:hover{color:var(--accent-strong);text-decoration:underline}
+
+  .layout{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
+  aside.sidebar{position:sticky;top:0;height:100vh;overflow-y:auto;background:var(--bg-elevated);border-right:1px solid var(--line);padding:32px 20px}
+  aside.sidebar .brand{font-weight:700;font-size:14px;margin-bottom:28px;display:flex;align-items:center;gap:8px}
+  aside.sidebar .brand .dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 12px var(--green)}
+  aside.sidebar nav{display:flex;flex-direction:column;gap:2px}
+  aside.sidebar nav a{display:block;padding:7px 12px;color:var(--fg-muted);font-size:13.5px;border-radius:6px;border-left:2px solid transparent;transition:all .15s}
+  aside.sidebar nav a:hover{color:var(--fg);background:var(--bg-card-hover);text-decoration:none}
+  aside.sidebar nav a.active{color:var(--accent);background:var(--accent-soft);border-left-color:var(--accent)}
+  aside.sidebar .footer{margin-top:32px;padding-top:16px;border-top:1px solid var(--line);color:var(--fg-dim);font-size:11.5px;line-height:1.5}
+  main{padding:60px 48px 120px;max-width:920px}
+  @media(max-width:900px){
+    .layout{grid-template-columns:1fr}
+    aside.sidebar{position:sticky;top:0;height:auto;border-right:none;border-bottom:1px solid var(--line);padding:16px 20px;z-index:10;backdrop-filter:blur(12px);background:rgba(22,25,34,.92)}
+    aside.sidebar .brand{margin-bottom:12px}
+    aside.sidebar nav{flex-direction:row;gap:8px;overflow-x:auto}
+    aside.sidebar nav a{white-space:nowrap;border-left:none;border-bottom:2px solid transparent;padding:6px 10px}
+    aside.sidebar nav a.active{border-left:none;border-bottom-color:var(--accent)}
+    aside.sidebar .footer{display:none}
+    main{padding:32px 20px 80px}
+  }
+
+  section{margin-bottom:72px;scroll-margin-top:24px}
+  section>h2{font-size:12.5px;color:var(--fg-muted);text-transform:uppercase;letter-spacing:.12em;font-weight:600;margin-bottom:6px}
+  section>h3.title{font-size:26px;font-weight:700;letter-spacing:-.01em;margin-bottom:10px;line-height:1.25}
+  section>p.subtitle{color:var(--fg-muted);font-size:15.5px;max-width:680px;margin-bottom:28px}
+  p{margin:.55em 0}
+  ul{padding-left:1.4em;margin:.6em 0}
+  ul li{margin:.4em 0}
+  code{background:rgba(127,127,127,.16);padding:.12em .4em;border-radius:3px;font-size:.88em}
+
+  .hero{margin-bottom:64px;padding-bottom:32px;border-bottom:1px solid var(--line)}
+  .hero .eyebrow{color:var(--accent);font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:.12em;margin-bottom:14px}
+  .hero h1{font-size:clamp(26px,4vw,38px);line-height:1.18;font-weight:700;letter-spacing:-.02em;margin-bottom:18px;background:linear-gradient(135deg,var(--fg) 0%,var(--accent-strong) 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .hero .lead{font-size:17px;color:var(--fg-muted);max-width:700px}
+  .hero .punchline{margin-top:28px;padding:18px 22px;background:var(--accent-soft);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;font-size:15px}
+  .hero .punchline strong{color:var(--accent-strong)}
+
+  .badge{display:inline-flex;align-items:center;gap:5px;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap}
+  .badge .ind{width:6px;height:6px;border-radius:50%}
+  .badge.implemented{background:var(--purple-soft);color:var(--purple)}.badge.implemented .ind{background:var(--purple)}
+  .badge.validated{background:var(--green-soft);color:var(--green)}.badge.validated .ind{background:var(--green)}
+  .badge.risk{background:var(--yellow-soft);color:var(--yellow)}.badge.risk .ind{background:var(--yellow)}
+  .badge.gap{background:var(--red-soft);color:var(--red)}.badge.gap .ind{background:var(--red)}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+  /* Terminal walkthrough */
+  .terminal{background:var(--bg-card);border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow)}
+  .terminal .head{display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--bg-elevated);border-bottom:1px solid var(--line)}
+  .terminal .dots{display:flex;gap:6px}
+  .terminal .dots span{width:12px;height:12px;border-radius:50%;background:var(--line-strong)}
+  .terminal .dots span:nth-child(1){background:#ff5f56}
+  .terminal .dots span:nth-child(2){background:#ffbd2e}
+  .terminal .dots span:nth-child(3){background:#27c93f}
+  .terminal .head .ttitle{color:var(--fg-muted);font-size:13px;margin-left:8px}
+  .terminal .stepper{margin-left:auto;display:flex;gap:6px}
+  .terminal .stepper button{width:28px;height:28px;border-radius:6px;background:var(--bg-card);color:var(--fg-muted);border:1px solid var(--line);font-size:13px;font-weight:600;cursor:pointer;transition:all .15s}
+  .terminal .stepper button.active{background:var(--accent);color:white;border-color:var(--accent)}
+  .terminal .stepper button:hover:not(.active){background:var(--bg-card-hover);color:var(--fg)}
+  .terminal .stage{display:grid;grid-template-columns:1.2fr 1fr;min-height:280px}
+  @media(max-width:760px){.terminal .stage{grid-template-columns:1fr}}
+  .terminal .term{background:var(--bg);padding:18px 22px;font-family:"JetBrains Mono",monospace;font-size:12.5px;line-height:1.7;overflow-x:auto;border-right:1px solid var(--line)}
+  @media(max-width:760px){.terminal .term{border-right:none;border-bottom:1px solid var(--line)}}
+  .terminal .term .prompt{color:var(--green);user-select:none}
+  .terminal .term .cmd{color:var(--fg)}
+  .terminal .term .out{color:var(--fg-dim);font-size:12px}
+  .terminal .term .hl{color:var(--accent)}
+  .terminal .term .ok{color:var(--green)}
+  .terminal .term .warn{color:var(--yellow)}
+  .terminal .explain{padding:18px 22px;display:flex;flex-direction:column;gap:10px}
+  .terminal .explain h4{font-size:15px;font-weight:600;display:flex;align-items:center;gap:8px}
+  .terminal .explain h4 .num{background:var(--accent);color:white;width:24px;height:24px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:700}
+  .terminal .explain p{color:var(--fg-muted);font-size:13.5px}
+  .terminal .explain .key{margin-top:4px;padding:9px 12px;background:var(--accent-soft);border-radius:6px;font-size:12.5px;border-left:2px solid var(--accent)}
+  .terminal .explain .gate{margin-top:4px;padding:9px 12px;background:var(--yellow-soft);border-radius:6px;font-size:12.5px;border-left:2px solid var(--yellow);color:var(--yellow)}
+  .terminal .step{display:none}
+  .terminal .step.active{display:contents}
+
+  /* Layer diagram */
+  .layers{background:var(--bg-card);border:1px solid var(--line);border-radius:12px;padding:28px}
+  .layer{display:grid;grid-template-columns:180px 1fr auto;gap:14px;align-items:center;padding:14px 18px;margin:8px 0;background:var(--bg-elevated);border-radius:8px;border-left:3px solid var(--accent);transition:transform .15s}
+  .layer:hover{transform:translateX(4px)}
+  .layer.hermes{border-left-color:var(--purple)}
+  .layer.claude{border-left-color:var(--green)}
+  .layer.user{border-left-color:var(--yellow)}
+  .layer .lname{font-family:"JetBrains Mono",monospace;font-size:13px;font-weight:600;color:var(--accent)}
+  .layer.hermes .lname{color:var(--purple)}
+  .layer.claude .lname{color:var(--green)}
+  .layer.user .lname{color:var(--yellow)}
+  .layer .lcontent{color:var(--fg-muted);font-size:13.5px}
+  .layer .ltag{font-size:10.5px;padding:3px 8px;border-radius:4px;background:var(--accent-soft);color:var(--accent);font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+  .layer.hermes .ltag{background:var(--purple-soft);color:var(--purple)}
+  .layer.claude .ltag{background:var(--green-soft);color:var(--green)}
+  .layer.user .ltag{background:var(--yellow-soft);color:var(--yellow)}
+  .layer-arrow{text-align:center;padding:3px;color:var(--fg-dim);font-size:16px}
+  @media(max-width:600px){.layer{grid-template-columns:1fr;gap:6px}.layer .ltag{justify-self:start}}
+
+  /* Before/after switch */
+  .switch-demo{background:var(--bg-card);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  .switch-demo .switch{display:flex;border-bottom:1px solid var(--line);background:var(--bg-elevated)}
+  .switch-demo .switch button{flex:1;padding:13px 18px;background:transparent;color:var(--fg-muted);border:none;cursor:pointer;font-size:13.5px;font-weight:600;border-bottom:2px solid transparent;transition:all .15s}
+  .switch-demo .switch button.active{color:var(--fg);border-bottom-color:var(--accent);background:var(--bg-card)}
+  .switch-demo .switch button:hover:not(.active){color:var(--fg);background:var(--bg-card-hover)}
+  .switch-demo .panel{display:none;padding:24px}
+  .switch-demo .panel.active{display:block}
+  .switch-demo .outcome{margin-top:14px;padding:12px 16px;border-radius:8px;font-size:13.5px;display:flex;align-items:flex-start;gap:10px}
+  .switch-demo .outcome .icon{font-size:17px;line-height:1;flex-shrink:0}
+  .switch-demo .outcome.bad{background:var(--red-soft);color:var(--red)}
+  .switch-demo .outcome.good{background:var(--green-soft);color:var(--green)}
+
+  /* Generic code block */
+  pre.code{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:14px 18px;font-size:12.5px;line-height:1.65;overflow-x:auto;margin:12px 0}
+  pre.code .k{color:var(--purple)}
+  pre.code .s{color:var(--green)}
+  pre.code .c{color:var(--fg-dim);font-style:italic}
+  pre.code .ok{color:var(--green);font-weight:bold}
+  pre.code .warn{color:var(--yellow)}
+
+  /* Decision cards */
+  .decision-list{display:flex;flex-direction:column;gap:12px}
+  .decision{background:var(--bg-card);border:1px solid var(--line);border-radius:10px;padding:16px 20px}
+  .decision .dtitle{font-weight:700;font-size:15px;margin-bottom:4px;display:flex;align-items:center;gap:8px}
+  .decision .dreason{color:var(--fg-muted);font-size:13.5px}
+
+  /* Experiments appendix */
+  .experiments{display:flex;flex-direction:column;gap:12px}
+  details.experiment{background:var(--bg-card);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  details.experiment summary{padding:14px 18px;cursor:pointer;list-style:none;display:flex;align-items:center;gap:10px;transition:background .15s}
+  details.experiment summary::-webkit-details-marker{display:none}
+  details.experiment summary:hover{background:var(--bg-card-hover)}
+  details.experiment summary .label{font-family:"JetBrains Mono",monospace;font-size:11.5px;color:var(--fg-dim);margin-right:8px}
+  details.experiment summary .etitle{font-size:14.5px;font-weight:600;flex:1}
+  details.experiment summary .result{font-size:11.5px;padding:2px 7px;border-radius:3px}
+  details.experiment summary .result.pass{background:var(--green-soft);color:var(--green)}
+  details.experiment summary .result.fail{background:var(--red-soft);color:var(--red)}
+  details.experiment summary .result.warn{background:var(--yellow-soft);color:var(--yellow)}
+  details.experiment summary .chevron{color:var(--fg-muted);font-size:12px;transition:transform .2s;margin-left:4px}
+  details.experiment[open] summary .chevron{transform:rotate(180deg)}
+  details.experiment .body{padding:0 18px 18px;border-top:1px solid var(--line);padding-top:14px;display:flex;flex-direction:column;gap:12px}
+  details.experiment .body h5{font-size:11.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--fg-muted);margin-bottom:4px;font-weight:600}
+  details.experiment .body pre{background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:12px 14px;font-size:12.5px;overflow-x:auto;line-height:1.6}
+  details.experiment .body .conclusion{padding:10px 12px;background:var(--accent-soft);border-radius:6px;font-size:13.5px;border-left:2px solid var(--accent)}
+
+  /* Risk list */
+  .risk-list{display:flex;flex-direction:column;gap:10px}
+  .risk{background:var(--bg-card);border:1px solid var(--line);border-radius:8px;padding:14px 18px;display:flex;gap:14px;align-items:flex-start}
+  .risk .severity{flex-shrink:0}
+  .risk .rtitle{font-weight:700;font-size:14px;margin-bottom:3px}
+  .risk .rdesc{color:var(--fg-muted);font-size:13.5px}
+  .risk .rmit{margin-top:6px;padding:6px 10px;background:var(--bg-elevated);border-radius:5px;font-size:12.5px;color:var(--fg-dim)}
+
+  /* Goal progress */
+  .goal-table{background:var(--bg-card);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  .goal-table table{width:100%;border-collapse:collapse}
+  .goal-table th{background:var(--bg-elevated);padding:10px 16px;text-align:left;font-size:12px;color:var(--fg-muted);text-transform:uppercase;letter-spacing:.08em;border-bottom:1px solid var(--line)}
+  .goal-table td{padding:12px 16px;border-bottom:1px solid var(--line);font-size:14px}
+  .goal-table tr:last-child td{border-bottom:none}
+  .goal-table .bar-wrap{background:var(--bg-elevated);border-radius:4px;height:8px;width:180px;overflow:hidden;display:inline-block;vertical-align:middle;margin-right:8px}
+  .goal-table .bar{height:100%;border-radius:4px;background:var(--accent)}
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <aside class="sidebar">
+    <div class="brand">
+      <span class="dot"></span>
+      <span>zhihu-loop v2</span>
+    </div>
+    <nav>
+      <a href="#overview" class="active">概览</a>
+      <a href="#how-it-works">工作流程</a>
+      <a href="#architecture">架构分工</a>
+      <a href="#before-after">v1 vs v2</a>
+      <a href="#goal">目标指标</a>
+      <a href="#decisions">关键决策</a>
+      <a href="#validated">已验证</a>
+      <a href="#risks">风险</a>
+      <a href="#experiments">实验附录</a>
+    </nav>
+    <div class="footer">
+      完整设计文档:<br>
+      <a href="../../agents/zhihu-loop-v2/design.md">design.md</a>
+    </div>
+  </aside>
+
+  <main>
+
+    <!-- HERO -->
+    <header class="hero" id="overview">
+      <div class="eyebrow">
+        <span class="badge implemented"><span class="ind"></span>已实现</span>
+        &nbsp;· 2026-08-09
+      </div>
+      <h1>知乎运营闭环 v2</h1>
+      <p class="lead">
+        hermes 定时驱动 SCOUT 和 MEASURE，Claude Code（Sonnet 4.6）负责写高质量答案，
+        三道飞书确认门保持用户掌控，目标 90 天涨到 1W 知乎关注者。
+      </p>
+      <div class="punchline">
+        <strong>核心结论</strong>：hermes cron 当调度器 + 通知网关，Claude Code 专注写作质量，
+        两个 hermes 任务（zhihu-daily / zhihu-cycle）已注册并激活。
+        从今天起，每天 08:00 自动推快报，每周一/四 09:00 自动推选题候选。
+      </div>
+    </header>
+
+    <!-- 工作流程 -->
+    <section id="how-it-works">
+      <h2>从用户视角</h2>
+      <h3 class="title">一个完整 cycle 的体验</h3>
+      <p class="subtitle">点步骤按钮或方向键切换；左边模拟终端，右边解释每步在做什么。</p>
+
+      <div class="terminal" data-stepper>
+        <div class="head">
+          <div class="dots"><span></span><span></span><span></span></div>
+          <div class="ttitle">zhihu-loop v2 · 完整 cycle</div>
+          <div class="stepper">
+            <button data-step="1" class="active">1</button>
+            <button data-step="2">2</button>
+            <button data-step="3">3</button>
+            <button data-step="4">4</button>
+            <button data-step="5">5</button>
+          </div>
+        </div>
+        <div class="stage">
+          <div class="term">
+
+            <!-- Step 1: SCOUT -->
+            <div class="step active" data-step="1">
+              <div class="out">-- hermes cron 周一 09:00 触发 --</div>
+              <div><span class="prompt">$</span> <span class="cmd">bash run-cycle.sh</span></div>
+              <div class="out">▶ SCOUT 启动 2026-08-11 09:00:01</div>
+              <div class="out">══ 热榜（opencli zhihu hot）══</div>
+              <div class="out">  热榜 20 条</div>
+              <div class="out">══ 大词搜索 ══</div>
+              <div class="out">  · <span class="hl">AI Agent 落地</span></div>
+              <div class="out">    [1847239] 为什么 AI Agent 总是在<br>    &nbsp;&nbsp;&nbsp;&nbsp;演示中很厉害，落地却一塌糊涂？</div>
+              <div class="out">  · <span class="hl">Harness Engineering</span></div>
+              <div class="out">    [2016648] Harness Engineering 的本质</div>
+              <div class="out">▶ 推送候选到飞书 ...</div>
+              <div class="out ok">✅ 已推 5 道候选 → 飞书</div>
+            </div>
+
+            <!-- Step 2: 门1 -->
+            <div class="step" data-step="2">
+              <div class="out warn">⏸ 门 1：等待用户选题</div>
+              <div class="out">-- 飞书卡片已推送 --</div>
+              <div class="out">用户飞书回复：</div>
+              <div><span class="prompt">&gt;</span> <span class="cmd">答 1847239</span></div>
+              <div class="out"></div>
+              <div class="out">-- 用户确认后，Claude Code 开始工作 --</div>
+              <div class="out">▶ CORPUS 搜索 tech-blog ...</div>
+              <div class="out">  找到 <span class="hl">378 篇</span>相关文章</div>
+              <div class="out">  Top: 【Agent设计模式】01-智能时代已至...</div>
+            </div>
+
+            <!-- Step 3: WRITE -->
+            <div class="step" data-step="3">
+              <div class="out">-- Claude Code 写答案 --</div>
+              <div><span class="prompt">$</span> <span class="cmd">/zhihu-loop</span></div>
+              <div class="out">▶ WRITE 起草答案 ...</div>
+              <div class="out">  qid: 1847239</div>
+              <div class="out">  引用素材: 3 篇 tech-blog 文章</div>
+              <div class="out">  字数: 1,847 字</div>
+              <div class="out">▶ HUMANIZER 检查 ...</div>
+              <div class="out ok">  ✅ AI 痕迹: 低（通过）</div>
+              <div class="out">▶ 草稿路径:</div>
+              <div class="out hl">  drafts/2026-08-11-ai-agent-demo.md</div>
+              <div class="out warn">⏸ 门 2：等待用户发布确认</div>
+            </div>
+
+            <!-- Step 4: 发布 -->
+            <div class="step" data-step="4">
+              <div class="out">-- 用户飞书确认「发」--</div>
+              <div><span class="prompt">$</span> <span class="cmd">bash publish.sh ai-agent-demo</span></div>
+              <div class="out">▶ 打包发布包 ...</div>
+              <div class="out ok">✅ git push → tech-blog</div>
+              <div class="out"></div>
+              <div class="out warn">→ 用户网页粘贴发布（知乎不支持 API 发布）</div>
+              <div class="out"></div>
+              <div class="out">-- 发布后回填 URL --</div>
+              <div><span class="prompt">$</span> <span class="cmd">bash fill-back-url.sh \</span></div>
+              <div class="out">    ai-agent-demo \</div>
+              <div class="out">    https://zhihu.com/question/...</div>
+              <div class="out ok">✅ state.json 更新</div>
+            </div>
+
+            <!-- Step 5: MEASURE + 快报 -->
+            <div class="step" data-step="5">
+              <div class="out">-- 次日 08:00 hermes 触发 --</div>
+              <div><span class="prompt">$</span> <span class="cmd">bash run-daily.sh</span></div>
+              <div class="out">▶ MEASURE ...</div>
+              <div class="out">  opencli zhihu question 1847239</div>
+              <div class="out">  排名=<span class="hl">3</span>  赞=<span class="ok">12</span></div>
+              <div class="out">▶ 每日快报 ...</div>
+              <div class="out">  📊 知乎每日快报 · 2026-08-12</div>
+              <div class="out">  回答 4/30  高赞 0/10</div>
+              <div class="out">  今日新增赞: +12</div>
+              <div class="out ok">✅ 推送到飞书/微信</div>
+            </div>
+
+          </div>
+          <div class="explain">
+
+            <div class="step active" data-step="1">
+              <h4><span class="num">1</span>自动 SCOUT</h4>
+              <p>hermes cron 在周一/周四 09:00 无声启动 <code>run-cycle.sh</code>，调用 opencli 扫热榜和 8 个大词，推飞书候选卡片。</p>
+              <div class="key">关键：完全自动，用户不需要手动触发，早上打开飞书就能看到候选。</div>
+            </div>
+
+            <div class="step" data-step="2">
+              <h4><span class="num">2</span>门 1：选题确认</h4>
+              <p>agent 不能自行决定回答哪道题——这是用户的判断。在飞书回复「答 &lt;qid&gt;」后，agent 自动检索 tech-blog 素材。</p>
+              <div class="gate">强制确认门，不可绕过。</div>
+            </div>
+
+            <div class="step" data-step="3">
+              <h4><span class="num">3</span>WRITE（Claude Code）</h4>
+              <p>由 Claude Sonnet 4.6 起草答案，引用至少 1 篇 tech-blog 旧文，加「延伸阅读」，经 humanizer-cn 去 AI 味。</p>
+              <div class="key">关键：WRITE 不在 hermes 里跑，始终是 Claude Code 保证质量。</div>
+            </div>
+
+            <div class="step" data-step="4">
+              <h4><span class="num">4</span>门 2 + 发布</h4>
+              <p>草稿通过后推飞书，用户确认「发」→ <code>publish.sh</code> 归档 git →用户网页粘贴发布 → <code>fill-back-url.sh</code> 记录 URL。</p>
+              <div class="gate">知乎无公开发布 API，网页发布是合规红线，不可绕过。</div>
+            </div>
+
+            <div class="step" data-step="5">
+              <h4><span class="num">5</span>自动 MEASURE + 快报</h4>
+              <p>每天 08:00 hermes 回收所有已发布回答的 votes/rank，生成进度快报推飞书/微信，包含 goal 进度条和建议。</p>
+              <div class="key">目前快报是回答赞聚合，账号粉丝数待 opencli 升级后加入。</div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 架构分工 -->
+    <section id="architecture">
+      <h2>系统架构</h2>
+      <h3 class="title">hermes 调度 · Claude Code 写作</h3>
+      <p class="subtitle">三个执行者，各司其职，通过飞书卡片协调。</p>
+
+      <div class="layers">
+        <div class="layer hermes">
+          <div class="lname">hermes cron</div>
+          <div class="lcontent">run-daily.sh（08:00）· run-cycle.sh（周一/四 09:00）· run-daily.sh 内嵌 topic-scout（周一）</div>
+          <div class="ltag">调度器</div>
+        </div>
+        <div class="layer-arrow">↕ 飞书卡片通知</div>
+        <div class="layer user">
+          <div class="lname">用户（飞书）</div>
+          <div class="lcontent">门 1：选题 · 门 2：发布确认 · 门 3：发起问题确认</div>
+          <div class="ltag">确认门</div>
+        </div>
+        <div class="layer-arrow">↕ 用户触发 /zhihu-loop</div>
+        <div class="layer claude">
+          <div class="lname">Claude Code</div>
+          <div class="lcontent">WRITE（起草答案）· HUMANIZER（去 AI 味）· humanizer-cn skill</div>
+          <div class="ltag">写作 LLM</div>
+        </div>
+        <div class="layer-arrow">↓ 发布</div>
+        <div class="layer" style="border-left-color:var(--fg-dim)">
+          <div class="lname" style="color:var(--fg-muted)">知乎</div>
+          <div class="lcontent">用户网页粘贴发布（合规红线）→ fill-back-url.sh 回填 URL</div>
+          <div class="ltag" style="background:var(--gray-soft);color:var(--gray)">手动</div>
+        </div>
+      </div>
+
+      <p style="margin-top:18px;color:var(--fg-muted);font-size:13.5px">
+        <strong>hermes 任务</strong>：<code>zhihu-daily</code>（cd2ba54231f2）每天 08:00 · <code>zhihu-cycle</code>（96130ab56756）周一/周四 09:00，均为 <code>--no-agent</code> 模式，不消耗 LLM token。
+      </p>
+    </section>
+
+    <!-- Before/After -->
+    <section id="before-after">
+      <h2>关键升级</h2>
+      <h3 class="title">v1 一次性答题 vs v2 持续闭环</h3>
+
+      <div class="switch-demo">
+        <div class="switch">
+          <button class="active" data-tab="v1">v1（原来）</button>
+          <button data-tab="v2">v2（现在）</button>
+        </div>
+        <div class="panel active" data-tab="v1">
+          <pre class="code"><span class="c"># 每次手动触发，无自动调度</span>
+/zhihu-answer-play
+  → 一次性找题 → 写答案 → 发布
+  → 结束，不再回来
+
+<span class="c"># measure 每 12h 跑，但结果只写 JSON</span>
+<span class="c"># 没有推送给用户</span>
+<span class="c"># 没有 topic-scout</span>
+<span class="c"># goal 是 90 天 200 粉（已过于保守）</span></pre>
+          <div class="outcome bad"><span class="icon">⚠</span><div>每次都要人工发起，没有每日反馈，无法形成学习闭环，目标低估 50 倍。</div></div>
+        </div>
+        <div class="panel" data-tab="v2">
+          <pre class="code"><span class="c"># hermes 自动驱动，用户只响应飞书</span>
+hermes cron → run-daily.sh  <span class="ok"># 每天 08:00</span>
+hermes cron → run-cycle.sh  <span class="ok"># 周一/四 09:00</span>
+
+<span class="c"># 每日推送</span>
+measure → daily-report → notify → 飞书
+
+<span class="c"># 每周发起新问题</span>
+topic-scout → 草稿 → 门 3 → 用户网页发起
+
+<span class="c"># goal 升级到 1W 粉</span>
+follower_delta.target = <span class="ok">10000</span></pre>
+          <div class="outcome good"><span class="icon">✓</span><div>全自动调度，每日快报，每周发起新话题，Claude Code 保证写作质量，hermes 保证执行不漏。</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Goal -->
+    <section id="goal">
+      <h2>目标</h2>
+      <h3 class="title">3 个月 1W 粉：指标分解</h3>
+      <p class="subtitle">杠杆在高赞回答——2 篇 ≥500 赞可带来约 4000 粉，10 篇 ≥100 赞再带 3000 粉，长尾补齐剩余。</p>
+
+      <div class="goal-table">
+        <table>
+          <thead>
+            <tr>
+              <th>指标</th>
+              <th>目标</th>
+              <th>进度（2026-08-09）</th>
+              <th>杠杆逻辑</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>粉丝增量</td>
+              <td>10,000</td>
+              <td>
+                <span class="bar-wrap"><span class="bar" style="width:0%"></span></span>
+                0
+              </td>
+              <td>爆款带动</td>
+            </tr>
+            <tr>
+              <td>回答数</td>
+              <td>30</td>
+              <td>
+                <span class="bar-wrap"><span class="bar" style="width:10%"></span></span>
+                3
+              </td>
+              <td>约 3 天一篇</td>
+            </tr>
+            <tr>
+              <td>高赞 ≥100</td>
+              <td>10</td>
+              <td>
+                <span class="bar-wrap"><span class="bar" style="width:0%"></span></span>
+                0
+              </td>
+              <td>精选竞争小的题</td>
+            </tr>
+            <tr>
+              <td>爆款 ≥500</td>
+              <td>2</td>
+              <td>
+                <span class="bar-wrap"><span class="bar" style="width:0%"></span></span>
+                0
+              </td>
+              <td>打热榜高热度</td>
+            </tr>
+            <tr>
+              <td>总获赞</td>
+              <td>5,000</td>
+              <td>
+                <span class="bar-wrap"><span class="bar" style="width:0%"></span></span>
+                0
+              </td>
+              <td>累计指标</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p style="margin-top:14px;color:var(--fg-muted);font-size:13.5px">
+        SCOUT 优先策略：热度 ≥100 + 回答数 ≤50 + 标题含"为什么/本质/怎么/如何"钩子词 + 命中用户专长（AI Agent / Harness / Claude）。
+      </p>
+    </section>
+
+    <!-- 决策 -->
+    <section id="decisions">
+      <h2>决策</h2>
+      <h3 class="title">关键选择与原因</h3>
+
+      <div class="decision-list">
+        <div class="decision">
+          <div class="dtitle">WRITE 由 Claude Code 执行，不由 hermes LLM</div>
+          <div class="dreason">用户明确选择。hermes 配置的 LLM 未知、质量不可控；答案质量直接影响赞数和涨粉速度，必须用 Sonnet 4.6。</div>
+        </div>
+        <div class="decision">
+          <div class="dtitle">hermes cron 用 <code>--no-agent</code> 模式</div>
+          <div class="dreason">SCOUT/MEASURE/daily-report 是纯 bash 逻辑，不需要 LLM。用 --no-agent 零 token 消耗，执行更快，不依赖 LLM 配额。</div>
+        </div>
+        <div class="decision">
+          <div class="dtitle">每日快报用回答赞聚合代替账号粉丝数</div>
+          <div class="dreason">实地检查发现 opencli zhihu 无 profile/stats 命令，无法自动读账号粉丝数。回答赞是现有能力，且与涨粉强相关，先跑起来。</div>
+        </div>
+        <div class="decision">
+          <div class="dtitle">发起问题用"门 3 + 用户网页操作"而非自动化</div>
+          <div class="dreason">opencli 无 create-question 命令；playwright 有账号安全风险且维护成本高。agent 起草草稿、用户一键发起，合规且稳定。</div>
+        </div>
+        <div class="decision">
+          <div class="dtitle">topic-scout 内嵌在 run-daily.sh 周一触发</div>
+          <div class="dreason">避免再注册一个 hermes cron job，周一已是最低用量日，顺带触发不增加心理负担。</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 已验证 -->
+    <section id="validated">
+      <h2>证据</h2>
+      <h3 class="title">实地验证了什么</h3>
+      <ul>
+        <li>scout.sh 真实调用 <code>opencli zhihu hot</code> 和 <code>opencli zhihu search</code>，非伪代码。</li>
+        <li>measure.sh 真实调用 <code>opencli zhihu question &lt;qid&gt; --limit 50 -f json</code>，能回收 votes/rank。</li>
+        <li>notify.sh 架构完整：<code>HERMES_FEISHU_TARGET=feishu:一人群</code> 和 <code>HERMES_WEIXIN_TARGET</code> 均已配置，hermes binary 存在。</li>
+        <li>daily-report.sh 实测输出正确：进度条、各回答赞、建议文案，格式可直接推飞书。</li>
+        <li>corpus-search.sh 实测：关键词"AI Agent Harness"命中 378 篇，Top 文章与主题高度相关。</li>
+        <li>topic-scout.sh dry-run 实测：热榜 20 条，搜索命中 8 条（含 Claude Code、MCP 协议、AI Agent 2026 等），问题草稿生成正常。</li>
+        <li>hermes cron 两个任务注册成功并激活，ID 已记录（zhihu-daily: cd2ba54231f2 · zhihu-cycle: 96130ab56756）。</li>
+      </ul>
+    </section>
+
+    <!-- 风险 -->
+    <section id="risks">
+      <h2>注意</h2>
+      <h3 class="title">遗留问题与风险</h3>
+
+      <div class="risk-list">
+        <div class="risk">
+          <div class="severity"><span class="badge risk"><span class="ind"></span>待验证</span></div>
+          <div>
+            <div class="rtitle">opencli 无账号粉丝数能力</div>
+            <div class="rdesc">每日快报只有回答赞，无法追踪粉丝真实增量，goal 进度条里粉丝一栏始终为 0。</div>
+            <div class="rmit">缓解：升级 opencli v1.7.12 → v1.8.6 + extension v1.0.22 后重新检查；若仍无，考虑 playwright 抓账号页。</div>
+          </div>
+        </div>
+        <div class="risk">
+          <div class="severity"><span class="badge risk"><span class="ind"></span>待处理</span></div>
+          <div>
+            <div class="rtitle">cycle 2 仍在 awaiting_publish</div>
+            <div class="rdesc">DeepSeek V4 Flash 回答（v2 草稿）未发布，旧 v1（answer id 2069508313591690890）需先在知乎网页删除。</div>
+            <div class="rmit">立即：知乎网页删 v1 → 粘贴 v2 → <code>bash fill-back-url.sh 2026-08-08-deepseek-v4-flash-agent-harness-v2 &lt;url&gt;</code></div>
+          </div>
+        </div>
+        <div class="risk">
+          <div class="severity"><span class="badge gap"><span class="ind"></span>脆弱</span></div>
+          <div>
+            <div class="rtitle">scout.sh perl timeout 在 macOS 不稳定</div>
+            <div class="rdesc">用 <code>perl fork/alarm</code> 技巧实现超时，依赖 IO::Popen，某些 macOS 版本会挂死。</div>
+            <div class="rmit">后续改为 Python <code>subprocess.run(timeout=...)</code>，10 行替换。</div>
+          </div>
+        </div>
+        <div class="risk">
+          <div class="severity"><span class="badge risk"><span class="ind"></span>目标压力</span></div>
+          <div>
+            <div class="rtitle">1W 粉依赖爆款，无爆款则 gap 大</div>
+            <div class="rdesc">90 天平均每天需涨 111 粉。前 30 天低属正常，但若第 30 天仍 &lt;500 粉，说明选题策略需调整。</div>
+            <div class="rmit">30 天节点复盘：检查赞/粉比，优先选更大热度的题，考虑主动在自己发起的问题下抢先回答。</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 实验附录 -->
+    <section id="experiments">
+      <h2>附录</h2>
+      <h3 class="title">Spike 中实际跑过的实验</h3>
+      <p class="subtitle">展开每个块可看到执行的命令和观察到的结果。</p>
+
+      <div class="experiments">
+
+        <details class="experiment">
+          <summary>
+            <span class="label">EXP 1</span>
+            <span class="etitle">opencli zhihu 命令集探查</span>
+            <span class="result pass">通过</span>
+            <span class="chevron">▼</span>
+          </summary>
+          <div class="body">
+            <div>
+              <h5>目的</h5>
+              <p>验证现有 scout.sh/measure.sh 是真实实现还是伪代码；查明 opencli 是否有 profile/create-question 命令。</p>
+            </div>
+            <div>
+              <h5>执行命令</h5>
+              <pre>$ opencli zhihu --help
+$ cat ~/.claude/skills/zhihu-loop/scripts/scout.sh
+$ cat ~/.claude/skills/zhihu-loop/scripts/measure.sh</pre>
+            </div>
+            <div>
+              <h5>观察结果</h5>
+              <pre>命令集：answer, collection, collections, comment, download,
+        favorite, follow, hot, like, question, search
+
+无 profile / stats / me / create-question 命令
+当前版本：v1.7.12（最新 v1.8.6）
+扩展：v1.0.5（最新 v1.0.22）
+
+scout.sh：真实调用 opencli zhihu hot + search ✅
+measure.sh：真实调用 opencli zhihu question ✅</pre>
+            </div>
+            <div class="conclusion">
+              <strong>结论：</strong>现有脚本是真实实现；但账号级粉丝数/总阅读数无法通过 opencli 获取，需要升级后 re-check 或另辟蹊径。
+            </div>
+          </div>
+        </details>
+
+        <details class="experiment">
+          <summary>
+            <span class="label">EXP 2</span>
+            <span class="etitle">hermes cron 语法验证</span>
+            <span class="result pass">通过（修正后）</span>
+            <span class="chevron">▼</span>
+          </summary>
+          <div class="body">
+            <div>
+              <h5>目的</h5>
+              <p>验证 hermes 的正确子命令和 cron 注册语法（原 hermes-setup.sh 用的是错误的 "schedule" 子命令）。</p>
+            </div>
+            <div>
+              <h5>执行命令</h5>
+              <pre>$ hermes --help           # 查看顶层命令
+$ hermes cron --help      # 确认 cron 子命令存在
+$ hermes cron add --help  # 查看参数格式
+$ hermes cron list        # 查看已有任务</pre>
+            </div>
+            <div>
+              <h5>观察结果</h5>
+              <pre>hermes 顶层：cron, webhook, kanban, send, ...（无 schedule）
+hermes cron add 语法：
+  hermes cron add "&lt;cron&gt;" "&lt;prompt&gt;" \
+    --name &lt;name&gt; --script &lt;file&gt; --no-agent --workdir &lt;dir&gt;
+
+已有任务：每日工作反省, ChessLens daily review, content-loop 每日一轮
+hermes binary: /Users/leiw/.local/bin/hermes ✅
+HERMES_FEISHU_TARGET=feishu:一人群 ✅
+HERMES_WEIXIN_TARGET=weixin:o9cq8... ✅</pre>
+            </div>
+            <div class="conclusion">
+              <strong>结论：</strong>hermes-setup.sh 的 "schedule" 子命令是错的，已修正为 "cron"；正确语法确认并注册了两个任务。
+            </div>
+          </div>
+        </details>
+
+        <details class="experiment">
+          <summary>
+            <span class="label">EXP 3</span>
+            <span class="etitle">daily-report.sh 实测输出</span>
+            <span class="result pass">通过</span>
+            <span class="chevron">▼</span>
+          </summary>
+          <div class="body">
+            <div>
+              <h5>目的</h5>
+              <p>验证 daily-report.sh 能正确读 state.json 并生成格式正确的每日快报。</p>
+            </div>
+            <div>
+              <h5>执行命令</h5>
+              <pre>$ bash ~/.claude/skills/zhihu-loop/scripts/daily-report.sh</pre>
+            </div>
+            <div>
+              <h5>观察结果</h5>
+              <pre># 知乎每日快报 · 2026-08-09
+📅 第 2 天（还剩 88 天）  目标：3 个月涨到 1W 粉
+
+## Goal 进度
+- 粉丝  [░░░░░░░░░░░░░░░░░░░░] 0/10000
+- 回答  [██░░░░░░░░░░░░░░░░░░] 3/30
+- 高赞(≥100)  [░░░░░░░░░░░░░░░░░░░░] 0/10
+
+## 今日回答表现
+| 回答 | 赞 | ±今日 | 排名 |
+|------|---:|------:|------|
+| AI-Agent-为什么落地效果普遍不佳 | 0 | 0 | - |
+| Harness-Engineering-的本质 | 0 | 0 | - |
+
+建议：📝 今日赞涨幅低，可以考虑更新旧答案或选一道新热题。</pre>
+            </div>
+            <div class="conclusion">
+              <strong>结论：</strong>格式正确，进度条生成正常，赞 delta 计算正确（当前全为 0，因为 metrics 还未 MEASURE 过）。
+            </div>
+          </div>
+        </details>
+
+        <details class="experiment">
+          <summary>
+            <span class="label">EXP 4</span>
+            <span class="etitle">corpus-search + topic-scout dry-run</span>
+            <span class="result pass">通过</span>
+            <span class="chevron">▼</span>
+          </summary>
+          <div class="body">
+            <div>
+              <h5>目的</h5>
+              <p>验证 corpus-search.sh 能找到相关 tech-blog 文章；topic-scout.sh 能正确调用 opencli 扫热点。</p>
+            </div>
+            <div>
+              <h5>执行命令</h5>
+              <pre>$ bash corpus-search.sh "AI Agent Harness"
+$ bash topic-scout.sh --dry-run</pre>
+            </div>
+            <div>
+              <h5>观察结果</h5>
+              <pre>corpus-search 结果：
+  找到 378 篇相关文章，展示 top 8：
+  - [438] 大模型应用&amp;AI Agent/Agent设计模式/...
+  - [382] 大模型应用&amp;AI Agent/Agent综述/...
+  ✅ corpus_hints 已写入 state.json
+
+topic-scout 热榜：20 条
+领域搜索结果（节选）：
+  [AI Agent 2026] 2026风向变了！建议所有程序员都去学AI Agent开发
+  [Claude Code] 万字长文图解 Claude Code 剖析源码
+  [MCP 协议] MCP 协议刚刚完成诞生以来最大升级
+草稿生成：question-draft-2026-08-09.md ✅</pre>
+            </div>
+            <div class="conclusion">
+              <strong>结论：</strong>两个脚本均工作正常。corpus-search 找到大量相关素材；topic-scout 扫到真实热门话题，问题草稿生成了两道高质量候选。
+            </div>
+          </div>
+        </details>
+
+        <details class="experiment">
+          <summary>
+            <span class="label">EXP 5</span>
+            <span class="etitle">hermes cron 任务注册验证</span>
+            <span class="result pass">通过</span>
+            <span class="chevron">▼</span>
+          </summary>
+          <div class="body">
+            <div>
+              <h5>目的</h5>
+              <p>确认两个 cron 任务成功注册并处于 active 状态。</p>
+            </div>
+            <div>
+              <h5>执行命令</h5>
+              <pre>$ hermes cron add "0 8 * * *" "知乎每日MEASURE+快报推送" \
+    --name zhihu-daily --script zhihu-daily.sh \
+    --no-agent --workdir /Users/leiw/Projects/...
+
+$ hermes cron add "0 9 * * 1,4" "知乎SCOUT选题→推候选" \
+    --name zhihu-cycle --script zhihu-cycle.sh \
+    --no-agent --workdir /Users/leiw/Projects/...
+
+$ hermes cron list</pre>
+            </div>
+            <div>
+              <h5>观察结果</h5>
+              <pre>cd2ba54231f2 [active]
+  Name: zhihu-daily
+  Schedule: 0 8 * * *
+  Script: zhihu-daily.sh · Mode: no-agent
+  Next run: 2026-08-10T08:00:00+08:00
+
+96130ab56756 [active]
+  Name: zhihu-cycle
+  Schedule: 0 9 * * 1,4
+  Script: zhihu-cycle.sh · Mode: no-agent
+  Next run: 2026-08-10T09:00:00+08:00</pre>
+            </div>
+            <div class="conclusion">
+              <strong>结论：</strong>两个任务均注册成功，状态 active，明天起开始自动执行。hermes cron 接管了 zhihu-loop 的定时驱动。
+            </div>
+          </div>
+        </details>
+
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+  // Sidebar active-section highlighting
+  (function() {
+    const links = Array.from(document.querySelectorAll('aside.sidebar nav a'));
+    const sections = links.map(a => document.querySelector(a.getAttribute('href')));
+    function update() {
+      const y = window.scrollY + 120;
+      let activeIdx = 0;
+      sections.forEach((s, i) => { if (s && s.offsetTop <= y) activeIdx = i; });
+      links.forEach((a, i) => a.classList.toggle('active', i === activeIdx));
+    }
+    window.addEventListener('scroll', update, { passive: true });
+    update();
+  })();
+
+  // Terminal stepper
+  (function() {
+    document.querySelectorAll('[data-stepper], .terminal').forEach(walk => {
+      const buttons = walk.querySelectorAll('.stepper button');
+      const steps = walk.querySelectorAll('.step');
+      if (!buttons.length) return;
+      buttons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const n = btn.dataset.step;
+          buttons.forEach(b => b.classList.toggle('active', b.dataset.step === n));
+          steps.forEach(s => s.classList.toggle('active', s.dataset.step === n));
+        });
+      });
+    });
+    document.addEventListener('keydown', e => {
+      const walk = document.querySelector('.terminal');
+      if (!walk) return;
+      if (e.key === 'ArrowRight') {
+        const active = walk.querySelector('.stepper button.active');
+        const next = active && active.nextElementSibling;
+        if (next) next.click();
+      } else if (e.key === 'ArrowLeft') {
+        const active = walk.querySelector('.stepper button.active');
+        const prev = active && active.previousElementSibling;
+        if (prev) prev.click();
+      }
+    });
+  })();
+
+  // Before/after switch
+  (function() {
+    document.querySelectorAll('.switch-demo .switch button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const tab = btn.dataset.tab;
+        const root = btn.closest('.switch-demo');
+        root.querySelectorAll('.switch button').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+        root.querySelectorAll('.panel').forEach(p => p.classList.toggle('active', p.dataset.tab === tab));
+      });
+    });
+  })();
+</script>
+
+</body>
+</html>
