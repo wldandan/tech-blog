@@ -47,3 +47,4 @@ generated_at: 2026-08-20T13:42:00Z
 - [《大模型应用&Agent应用开发技术栈-全景图》](https://zhuanlan.zhihu.com/p/694428893)
 - [《Agent入门到精通》系列](https://zhuanlan.zhihu.com/p/1998733226689202164)（14 篇，从 Agent 本质到生产级架构、评估优化全覆盖）
 - [《Multi-Agent 是否真的必要，Single-Agent 做好后能否覆盖绝大多数场景？》](https://www.zhihu.com/answer/2071969857327871349)——"什么时候该拆 Agent"的具体判断标准
+- [《同一个模型，换Holistic Agent评估框架，错误定位能力涨了12倍》](https://zhuanlan.zhihu.com/p/2044814054036879000)——真撞到"评测体系"这堵墙时再看这系列（【Agent评测】01-11）
