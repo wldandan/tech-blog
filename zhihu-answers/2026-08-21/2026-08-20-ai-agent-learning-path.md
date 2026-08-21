@@ -17,6 +17,7 @@ generated_at: 2026-08-20T13:42:00Z
 
 > qid: 2050002729800668305
 > slug: 2026-08-20-ai-agent-learning-path
+> 链接: https://www.zhihu.com/question/2050002729800668305
 
 ---
 
