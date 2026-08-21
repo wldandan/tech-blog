@@ -6,7 +6,7 @@
 ---
 
 ---
-status: awaiting_confirmation
+status: pending_web_publish
 question_id: 2050002729800668305
 word_count: 1962
 humanizer: passed
@@ -51,6 +51,6 @@ generated_at: 2026-08-20T13:42:00Z
 
 **延伸阅读**
 
-- tech-blog《大模型应用&Agent应用开发技术栈-全景图》
-- tech-blog《Agent入门到精通》系列（14 篇，从 Agent 本质到生产级架构、评估优化全覆盖）
-- 我之前答过的《Multi-Agent 是否真的必要》，里面展开了"什么时候该拆 Agent"的具体判断标准
+- [《大模型应用&Agent应用开发技术栈-全景图》](https://zhuanlan.zhihu.com/p/694428893)
+- [《Agent入门到精通》系列](https://zhuanlan.zhihu.com/p/1998733226689202164)（14 篇，从 Agent 本质到生产级架构、评估优化全覆盖）
+- [《Multi-Agent 是否真的必要，Single-Agent 做好后能否覆盖绝大多数场景？》](https://www.zhihu.com/answer/2071969857327871349)——"什么时候该拆 Agent"的具体判断标准
